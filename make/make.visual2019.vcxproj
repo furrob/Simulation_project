@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\logger.cpp" />
     <ClCompile Include="..\source\main.cpp" />
     <ClCompile Include="..\source\medium.cpp" />
     <ClCompile Include="..\source\packet.cpp" />
@@ -28,9 +29,11 @@
     <ClCompile Include="..\source\wirelessnetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\logger.h" />
     <ClInclude Include="..\source\medium.h" />
     <ClInclude Include="..\source\packet.h" />
     <ClInclude Include="..\source\packetgenerator.h" />
+    <ClInclude Include="..\source\process.h" />
     <ClInclude Include="..\source\receiver.h" />
     <ClInclude Include="..\source\transmitter.h" />
     <ClInclude Include="..\source\wirelessnetwork.h" />
