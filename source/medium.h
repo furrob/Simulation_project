@@ -1,9 +1,11 @@
 #ifndef MEDIUM_H
 #define MEDIUM_H
 
+#include "logger.h"
 #include "packet.h"
 
-#include <list>
+#include <functional>
+#include <queue>
 
 class Packet;
 
@@ -11,6 +13,12 @@ class Packet;
 class Medium
 {
 public:
+  typedef std::priority_queue<Packet*, std::deque<Packet*>, std::function<bool(Packet*, Packet*)>> packet_queue;
+
+  Medium(Logger* logger);
+
+  ~Medium();
+
   //Returns true if medium is free to transmit.
   bool is_available() { return available_; }
 
@@ -26,7 +34,7 @@ public:
 private:
   //Queue of packets currently being transmitted. If more than one packet is present in
   //this queue, collision occurred.
-  std::priority_queue<Packet*> packets_;
+  packet_queue* packets_ = nullptr;
 
   //Signals if medium is available for transmission (=queue of packets being transmitted is empty)
   bool available_ = true;
@@ -39,14 +47,5 @@ private:
   Logger* logger_ = nullptr;
 };
 
-/*
-struct ACKCounter
-{
-public:
-  void Increment() { ++count; }
-  void Decrement() { --count; }
-private:
-  int count = 0;
-};
-*/
+
 #endif

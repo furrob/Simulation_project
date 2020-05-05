@@ -1,10 +1,13 @@
 #ifndef PACKETGENERATOR_H
 #define PACKETGENERATOR_H
 
-#include "process.h"
 #include "logger.h"
 #include "packet.h"
-#include  <string>
+#include "process.h"
+#include "transmitter.h"
+#include "simulator.h"
+
+#include <cstdlib>
 
 class Transmitter;
 
@@ -13,13 +16,19 @@ class PacketGenerator :
   public Process
 {
 public:
+
+  PacketGenerator(Simulator* simulator, Transmitter* transmitter);
+
+  ~PacketGenerator();//TODO <this
+
   void Execute() override;
 
   void Activate(double time) override;
 
 private:
-  //Time of next packet arrival in network (CGP)
-  double generation_time_ = -1;
+  int id_ = -1;
+
+  Simulator* simulator_ = nullptr;
 
   //Pointer to transmitter, to which buffer generated packets will go
   Transmitter* transmitter_ = nullptr;

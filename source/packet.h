@@ -2,13 +2,16 @@
 #define PACKET_H
 
 #include "process.h"
-#include "logger.h"
 #include "transmitter.h"
-//#include "medium.h"
+#include "medium.h"
+#include "logger.h"
+#include "wirelessnetwork.h"
+#include "simulator.h"
+
+#include <cstdlib>
+#include <string>
 
 class Medium;
-class Receiver;
-class Logger;
 
 //Class representing a single packet in network
 class Packet :
@@ -18,9 +21,13 @@ public:
   //Enum used to represent Packet state
   enum class State {IN_BUFFER, MEDIUM_ACCESSING, IN_TRANSIT, VERIFYING, RECEIVED};
 
+  Packet(Simulator* simulator, Transmitter* transmitter);
+
+  //on Packet destruction, signal transmitter that it can process next packet from buffer (if exists)
+  ~Packet();
+
   //Returns random retransmission time for specified packet
   double GetCRPTime();
-
 
   void set_collision(bool collision) { collided_ = collision; }
 
@@ -37,20 +44,18 @@ public:
 
   void Activate(double time) override;
 
-  Packet(Transmitter* transmitter, Receiver* receiver, Medium* channel, Logger* logger);
-
 private:
   //ID used to mark logs
   int id_ = 0;
+
+  //Pointer to simulator object, needed for agenda access etc
+  Simulator* simulator_ = nullptr;
 
   //State of Packet process
   State state_ = State::IN_BUFFER;
 
   //Transmitter - orign of this packet
   Transmitter* transmitter_ = nullptr;
-
-  //Receiver - destination of this packet
-  Receiver* receiver_ = nullptr;
 
   //Time needed for packet to travel between tx-rx
   double transmission_time_ = 0;

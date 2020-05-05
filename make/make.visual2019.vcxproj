@@ -25,16 +25,19 @@
     <ClCompile Include="..\source\packet.cpp" />
     <ClCompile Include="..\source\packetgenerator.cpp" />
     <ClCompile Include="..\source\receiver.cpp" />
+    <ClCompile Include="..\source\simulator.cpp" />
     <ClCompile Include="..\source\transmitter.cpp" />
     <ClCompile Include="..\source\wirelessnetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\inc.h" />
     <ClInclude Include="..\source\logger.h" />
     <ClInclude Include="..\source\medium.h" />
     <ClInclude Include="..\source\packet.h" />
     <ClInclude Include="..\source\packetgenerator.h" />
     <ClInclude Include="..\source\process.h" />
     <ClInclude Include="..\source\receiver.h" />
+    <ClInclude Include="..\source\simulator.h" />
     <ClInclude Include="..\source\transmitter.h" />
     <ClInclude Include="..\source\wirelessnetwork.h" />
   </ItemGroup>

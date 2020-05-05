@@ -1,5 +1,9 @@
 #ifndef TRANSMITTER_H
 #define TRANSMITTER_H
+
+#include "packet.h"
+#include "packetgenerator.h"
+
 #include <queue>
 
 class Packet;
@@ -9,14 +13,24 @@ class PacketGenerator;
 class Transmitter
 {
 public:
+
+  Transmitter(int id, PacketGenerator* packet_generator);
+
+  ~Transmitter(); //TODO write destructor
+
+  int get_id() const
+  {
+    return id_;
+  }
+
   //Returns true if there is ongoing packet transmission
-  bool is_busy() { return (packet_ == nullptr) ? false : true; }
+  bool is_busy() const { return (packet_ == nullptr) ? false : true; }
 
   //Returns previously drawn transmission time
   //generate_next = true draws next random time
   double get_transmission_time(bool generate_next = false)
   {
-    double temp_time = transmission_time_;
+    const double temp_time = transmission_time_;
     if(generate_next)
       transmission_time_ = static_cast<double>(rand() % 10) + 1; //random number <1;10> - (CTP)
     return temp_time;;
@@ -28,7 +42,8 @@ public:
   //Place incoming packet into buffer
   void AddPacket(Packet* packet);
 
-  //Process next packet from buffer
+  //Process next packet from buffer - if buffer is empty, packet after being generated automatically checks if it can be send when Execute()
+  //called for the first time
   void SendNext();
 
 private:
