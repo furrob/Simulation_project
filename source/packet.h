@@ -12,6 +12,8 @@
 #include <string>
 
 class Medium;
+class Process;
+class Simulator;
 
 //Class representing a single packet in network
 class Packet :
@@ -45,16 +47,13 @@ public:
   void Activate(double time) override;
 
 private:
-  //ID used to mark logs
-  int id_ = 0;
-
   //Pointer to simulator object, needed for agenda access etc
   Simulator* simulator_ = nullptr;
 
   //State of Packet process
   State state_ = State::IN_BUFFER;
 
-  //Transmitter - orign of this packet
+  //Transmitter - origin of this packet
   Transmitter* transmitter_ = nullptr;
 
   //Time needed for packet to travel between tx-rx

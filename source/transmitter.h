@@ -2,21 +2,21 @@
 #define TRANSMITTER_H
 
 #include "packet.h"
-#include "packetgenerator.h"
+//#include "packetgenerator.h"
 
 #include <queue>
 
 class Packet;
-class PacketGenerator;
+//class PacketGenerator;
 
 //Class representing a single transmitter (and its components) in network 
 class Transmitter
 {
 public:
 
-  Transmitter(int id, PacketGenerator* packet_generator);
+  Transmitter(int id);
 
-  ~Transmitter(); //TODO write destructor
+  ~Transmitter(); //TODO write destructor - clear buffer and things like that / not necessary - simulator destructor takescare of it?
 
   int get_id() const
   {
@@ -46,6 +46,9 @@ public:
   //called for the first time
   void SendNext();
 
+  //Remove oldest packet from input buffer
+  void PopFromBuffer();
+
 private:
   //Transmitter ID
   const int id_ = 0;
@@ -60,6 +63,6 @@ private:
   double transmission_time_ = 0;
 
   //Pointer to packet generator (independently generated packets will go to transmitter's buffer)
-  PacketGenerator* generator_ = nullptr;
+  //PacketGenerator* generator_ = nullptr;
 };
 #endif

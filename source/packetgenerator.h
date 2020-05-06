@@ -10,6 +10,8 @@
 #include <cstdlib>
 
 class Transmitter;
+class Simulator;
+class Process;
 
 //Class used to independently generate new packets and place it in buffers
 class PacketGenerator :
@@ -19,15 +21,15 @@ public:
 
   PacketGenerator(Simulator* simulator, Transmitter* transmitter);
 
-  ~PacketGenerator();//TODO <this
+  ~PacketGenerator();
 
   void Execute() override;
 
+  //Reschedule with updated time - assumption -> if Activate() is called,
+  //process *is* already removed from Agenda
   void Activate(double time) override;
 
 private:
-  int id_ = -1;
-
   Simulator* simulator_ = nullptr;
 
   //Pointer to transmitter, to which buffer generated packets will go

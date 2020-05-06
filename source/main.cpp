@@ -3,49 +3,40 @@
 int main(int argc, char *argv[] )
 {
   std::cout << "M4 A3\n";
-  //
-  //WirelessNetwork network;
-  //Transmitter transmitter;
-  ////Receiver receiver; //useless?
-  //PacketGenerator generator;
-  //Medium channel;
-  //
-  //Logger logger("./../LOG.txt");
-  //logger.set_mode_flag(Logger::Mode::ERROR);
-  //logger.set_mode_flag(Logger::Mode::INFO);
-  //logger.set_mode_flag(Logger::Mode::DEBUG);
-  //logger.set_target_flag(Logger::Target::CONSOLE);
-  //
-  //auto packet = new Packet(&transmitter, &channel, &logger);
-  //
-  //TEST TEST TEST TEST TEST
-  //while(!packet->terminated())
-  //{
-  //  packet->Execute();
-  //}
 
-  //delete packet;
-  //Simulator simulator();
+  Logger logger("./../LOG.txt");
+  logger.set_flag(Logger::Target::CONSOLE);
+  //logger.set_flag(Logger::Target::FILE); <- not quite ready for now (it works, but not humanitarian enough)
 
-  auto comp = [](int l, int r) {return l > r; };
+  Simulator simulator = Simulator(&logger);
+  simulator.Initialize();
 
-  std::priority_queue<int, std::deque<int>, std::function<bool(int, int)>> que(comp);
+  logger.set_flag(Logger::Mode::ERROR);
+  logger.set_flag(Logger::Mode::INFO);
+  logger.set_flag(Logger::Mode::DEBUG);
 
-  int tab[] = { 6,3,5,6,8,3,2,6,8,4,2 };
-
-  for(int i = 0; i < sizeof(tab) / sizeof(int); ++i)
-  {
-    que.push(tab[i]);
-  }
-
-  for(int i = 0; i < sizeof(tab) / sizeof(int); ++i)
-  {
-    std::cout << que.top() << " ";
-    //que.pop();
-  }
-
-  if(que.empty())
-    std::cout << "\nkoniec\n";
+  //to alter "generation density" head to generator's Execute() function
+  simulator.Run(500); //100ms limit results in ~1000 main loop iterations; 500ms - around 10k
 
   return 0;
 }
+  //************************************************************************************
+  //auto comp = [](int l, int r) {return l > r; };
+
+  //std::priority_queue<int, std::deque<int>, std::function<bool(int, int)>> que(comp);
+
+  //int tab[] = { 6,3,5,6,8,3,2,6,8,4,2 };
+
+  //for(int i = 0; i < sizeof(tab) / sizeof(int); ++i)
+  //{
+  //  que.push(tab[i]);
+  //}
+
+  //for(int i = 0; i < sizeof(tab) / sizeof(int); ++i)
+  //{
+  //  std::cout << que.top() << " ";
+  //  //que.pop();
+  //}
+
+  //if(que.empty())
+  //  std::cout << "\nkoniec\n";

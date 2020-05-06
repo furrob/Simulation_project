@@ -5,11 +5,14 @@
 #include "logger.h"
 #include "transmitter.h"
 #include "simulator.h"
+#include "packetgenerator.h"
 
 #include <vector>
+#include <cstdlib>
 
 class Medium;
-class Transmitter;
+class PacketGenerator;
+class Simulator;
 
 //Encapsulates wireless transmission system and all of its elements
 class WirelessNetwork
@@ -18,14 +21,16 @@ public:
   static constexpr double ack_time = 10.0;
 
   //Number of retransmissions before packet rejection
-  const static int max_retransmission_count_ = 10;
+  const static int max_retransmission_count = 10;
 
  //Number of tx-rx pairs in network
-  const int terminal_pairs_count_ = 10;
+  const int terminal_pairs_count = 10;
 
   WirelessNetwork(Simulator* simulator, Logger* logger);
 
   ~WirelessNetwork();
+
+  int Initialize();
 
 
   Medium* get_channel() const
@@ -48,7 +53,8 @@ private:
   int next_packet_id_ = -1;
 
   //Vector of transmitters
-  std::vector<Transmitter*> transmitters_;
+  //std::vector<Transmitter*> transmitters_; //not needed
+  std::vector<PacketGenerator*> generators_;
 
   //Vector of receivers
   //std::vector<Receiver*> receivers_; //not needed

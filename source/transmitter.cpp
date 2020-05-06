@@ -2,12 +2,17 @@
 
 #include "packet.h"
 
-Transmitter::Transmitter(int id, PacketGenerator* packet_generator): generator_(packet_generator), id_(id)
+Transmitter::Transmitter(int id): id_(id)
 {
   while(!buffer_.empty())
     buffer_.pop();
 
   get_transmission_time(true);
+}
+
+Transmitter::~Transmitter()
+{
+
 }
 
 void Transmitter::AddPacket(Packet* packet)
@@ -22,4 +27,9 @@ void Transmitter::SendNext()
     //invoke next packet from buffer
     buffer_.front()->Activate(0);
   }
+}
+
+void Transmitter::PopFromBuffer()
+{
+  buffer_.pop();
 }

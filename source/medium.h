@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <queue>
+#include <string>
 
 class Packet;
 

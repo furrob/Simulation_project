@@ -21,7 +21,10 @@ void Medium::Reserve(Packet* packet)
   available_ = false;
 
   if(packets_->size() > 1)
+  {
     collision_ = true;
+    logger_->Debug("!!! Collision - " + std::to_string(packets_->size()) + " packets corrupted !!!\n");
+  }
 }
 
 Packet* Medium::EndTransmission()

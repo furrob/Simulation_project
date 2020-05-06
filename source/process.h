@@ -7,7 +7,7 @@ class Simulator;
 class Process
 {
 public:
-  //virtual ~Process() = default;
+  virtual ~Process() = default; //pretty important
 
   virtual void Execute() = 0;
   virtual void Activate(double time) = 0;
@@ -17,7 +17,18 @@ public:
     return time_;
   }
 
+  int get_id() const
+  {
+    return id_;
+  }
+
+  bool is_terminated() const
+  {
+    return is_terminated_;
+  }
+
 protected:
+  int id_ = 0;
   bool is_terminated_ = false;
   double time_ = -1;
   Simulator* simulator_ = nullptr;
