@@ -52,9 +52,9 @@ int Simulator::Run(double max_clock)
       std::to_string(iteration) + "\n");//Debug of Info
     logger_->IndentForward();
 
-    if(mode != 'y') //as long as key pressed is different from KEY_AUTO, keep asking to press different key to continue to next "step"
+    if(mode != 'y') //as long as key pressed is different from 'y', keep asking to press different key to continue to next "step"
     {
-      logger_->Info("Press [y] to switch to continuous mode, press any other key to perform next loop iteration ");
+      logger_->Info("Press [y] to switch to continuous mode, or press any other alphanumeric key to perform next loop iteration ");
       mode = _getch();
       logger_->Info("\n\n");
     }
