@@ -27,9 +27,15 @@ public:
     return is_terminated_;
   }
 
+  bool is_last() const
+  {
+    return last_;
+  }
+
 protected:
   int id_ = 0;
   bool is_terminated_ = false;
+  bool last_ = false;
   double time_ = -1;
   Simulator* simulator_ = nullptr;
 };

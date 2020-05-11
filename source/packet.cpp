@@ -14,20 +14,7 @@ Packet::Packet(Simulator* simulator, Transmitter* transmitter):
 
 Packet::~Packet()
 {
-  if(simulator_->is_going())
-  {
-    logger_->Debug("Deleting Packet " + std::to_string(id_) + " -> signal transmitter to serve next packet from buffer\n");
-
-    //TODO modify this to take "end of simulation" deleting into account (w/o calling tx methods)
-
-    //mark transmitter as ready to send next packet
-    transmitter_->set_packet(nullptr);
-    transmitter_->SendNext();
-  }
-  else
-  {
-    logger_->Debug("Deleting Packet " + std::to_string(id_) + "\n");
-  }
+  logger_->Debug("Deleting Packet " + std::to_string(id_) + "\n"); //log
 }
 
 double Packet::GetCRPTime()
@@ -73,12 +60,11 @@ void Packet::Execute()
 
       case State::MEDIUM_ACCESSING:
       {
-        //logger_->Debug("Channel availability checking -> ");
         if(channel_->is_available())
         {
           logger_->Debug("Channel availability checking -> channel available\n");
-          state_ = State::IN_TRANSIT;  //Medium available - begin transmission
-          active = true; //instead of calling Activate(0);
+          state_ = State::SENDING;  //Medium available - begin transmission
+          active = true;
         }
         else
         {
@@ -88,23 +74,37 @@ void Packet::Execute()
         break;
       }
 
-      case State::IN_TRANSIT:
+      case State::SENDING:
       {
         if(retransmission_count_ <= WirelessNetwork::max_retransmission_count)
         {
-          logger_->Debug("Sending\n");
-          channel_->Reserve(this);//"Put" packet into channel and handle collisions
-          this->TransmissionError();//Random chance that packet data is somehow corrupted - default for now is 30%
-          state_ = State::VERIFYING;
-          Activate(transmission_time_);  //wait for transmission time
+          logger_->Debug("Preparing to send\n");
+          channel_->Transmit(this);//"Put" packet into channel and handle collisions
+          this->TransmissionError();//Random chance that packet data is somehow corrupted - default for now is 20%
+          state_ = State::IN_TRANSIT;
+
+          last_ = true; //to reserve channel after putting packet into it ( to let collisions occur)
+          Activate(0);  //wait for transmission time
         }
         else
         {
           logger_->Debug("Too many retransmissions -> scheduling packet deletion\n");
-          is_terminated_ = true; //too many retransmissions - deleting from system based on this flag - maybe Activate(0) and then before
-          //calling Execute() check this flag and delete if set - then signal to transmitter that it can process next packet from buffer
-          Activate(0);
+          is_terminated_ = true; //too many retransmissions - deleting from system based on this flag
+
+          logger_->Debug("Signal transmitter to serve next packet from buffer\n");
+          transmitter_->set_packet(nullptr);
+          transmitter_->SendNext();
         }
+        break;
+      }
+
+      case State::IN_TRANSIT:
+      {
+        last_ = false;
+        channel_->Reserve();
+        logger_->Debug("Channel reservation, sending\n");
+        state_ = State::VERIFYING;
+        Activate(transmission_time_);
         break;
       }
 
@@ -112,7 +112,7 @@ void Packet::Execute()
       {
         logger_->Debug("Arriving at receiver\n");
         ; //Take out packet from channel
-        if(channel_->EndTransmission() != this) //make sure its right one
+        if(channel_->EndTransmission(id_) != this) //make sure its right one
         {
           logger_->Error("PACKET::EXECUTE Wrong packet received\n");
           break;
@@ -126,12 +126,14 @@ void Packet::Execute()
 
         logger_->Debug("Waiting for ACK\n");
 
+        last_ = true; //for channel releasing purposes
         Activate(WirelessNetwork::ack_time);
         break;
       }
 
       case State::RECEIVED:
       {
+        last_ = false;
         if(Verify())
         {
           logger_->Debug("ACK received -> scheduling packet deletion\n");
@@ -139,8 +141,9 @@ void Packet::Execute()
           channel_->Release(); //free channel after ACK received
 
           is_terminated_ = true; //If no errors or collision
-          //signal to first packet waiting in buffer will be in packet destructor
-          Activate(0); //place process in queue, and then delete it when dequeuing 
+          logger_->Debug("Signal transmitter to serve next packet from buffer\n");
+          transmitter_->set_packet(nullptr);
+          transmitter_->SendNext();
         }
         else
         {

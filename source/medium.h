@@ -14,7 +14,7 @@ class Packet;
 class Medium
 {
 public:
-  typedef std::priority_queue<Packet*, std::deque<Packet*>, std::function<bool(Packet*, Packet*)>> packet_queue;
+  typedef std::vector<Packet*> packet_queue;
 
   Medium(Logger* logger);
 
@@ -23,18 +23,21 @@ public:
   //Returns true if medium is free to transmit.
   bool is_available() { return available_; }
 
-  //Place packet in queue, make medium not available. If there is more than one packet in, raise collision flag
-  void Reserve(Packet* packet);
+  //Place packet in vector. If there is more than one packet in, raise collision flag
+  void Transmit(Packet* packet);
+
+  //Marks channel as not available for transmission
+  void Reserve();
 
   //Dequeue packet with the lowest transmission time, if collision flag is risen, mark packet as collided
-  Packet* EndTransmission();
+  Packet* EndTransmission(int id);
 
   //Marks medium as free to transmit if no packets in transmission
   void Release();
 
 private:
-  //Queue of packets currently being transmitted. If more than one packet is present in
-  //this queue, collision occurred.
+  //Vector of packets currently being transmitted. If more than one packet is present in
+  //this vector, collision occurred.
   packet_queue* packets_ = nullptr;
 
   //Signals if medium is available for transmission (=queue of packets being transmitted is empty)

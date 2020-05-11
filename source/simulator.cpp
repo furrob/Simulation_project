@@ -3,7 +3,10 @@
 Simulator::Simulator(Logger* logger): logger_(logger)
 {
   //front small <-> back big
-  auto comp = [](Process* l, Process* r) {return l->get_time() > r->get_time(); };
+  auto comp = [](Process* l, Process* r)
+  {
+    return ((l->get_time() == r->get_time()) ? l->is_last() > r->is_last() : l->get_time() > r->get_time()); //that -should- work
+  };
   agenda_ = new Agenda(comp);
 }
 
@@ -14,7 +17,7 @@ Simulator::~Simulator()
   {
     auto temp = agenda_->top();
     agenda_->pop();
-    delete temp; //TODO <- TAKE CARE OF THIS
+    delete temp;
   }
 }
 
@@ -43,12 +46,17 @@ int Simulator::Run(double max_clock)
   char mode ='a';
   int iteration = 0;
 
-  logger_->Debug("\nSIMULATION CLOCK LIMIT: " + std::to_string(max_clock) + "[ms]\n");
+  logger_->Info("\nSIMULATION CLOCK LIMIT: " + std::to_string(max_clock) + "[ms]\n");
 
   while(clock_ < max_clock)
   {
+
+    Process* process = agenda_->top();
+    agenda_->pop();
+    clock_ = process->get_time();
     ++iteration;
-    logger_->Debug("SIMULATION CLOCK: " + std::to_string(clock_) + "[ms], ITERATION #" + 
+
+    logger_->Info("SIMULATION CLOCK: " + std::to_string(clock_) + "[ms], ITERATION #" + 
       std::to_string(iteration) + "\n");//Debug of Info
     logger_->IndentForward();
 
@@ -58,12 +66,10 @@ int Simulator::Run(double max_clock)
       mode = _getch();
       logger_->Info("\n\n");
     }
-    Process* process = agenda_->top();
-    agenda_->pop();
 
-    clock_ = process->get_time();
+    process->Execute();
 
-    //only for packets, generators are eternal
+    //only for packets, generators are -e t e r n a l-
     if(process->is_terminated())
     {
       delete process;
@@ -71,8 +77,6 @@ int Simulator::Run(double max_clock)
       logger_->IndentBack();
       continue;
     }
-
-    process->Execute();
 
     logger_->Debug("\n");
     logger_->IndentBack();

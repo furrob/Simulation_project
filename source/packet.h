@@ -21,7 +21,7 @@ class Packet :
 {
 public:
   //Enum used to represent Packet state
-  enum class State {IN_BUFFER, MEDIUM_ACCESSING, IN_TRANSIT, VERIFYING, RECEIVED};
+  enum class State {IN_BUFFER, MEDIUM_ACCESSING, SENDING, IN_TRANSIT, VERIFYING, RECEIVED};
 
   Packet(Simulator* simulator, Transmitter* transmitter);
 
@@ -34,7 +34,7 @@ public:
   void set_collision(bool collision) { collided_ = collision; }
 
   //Randomly marks Packet as corrupted (has_errors_ = true)
-  void TransmissionError(int percent = 30) { has_errors_ = ((rand() % 100 + 1) <= percent) ? true : false; } //TEST
+  void TransmissionError(int percent = 20) { has_errors_ = ((rand() % 100 + 1) <= percent) ? true : false; } //TEST
 
   //Returns true if packet has no error or collision
   bool Verify() { return (!has_errors_ && !collided_); }
@@ -64,9 +64,6 @@ private:
 
   //Flag to indicate collision
   bool collided_ = false;
-
-  //Flag used to chceck if packet was transmitted correctly
-  bool ack_ = false;
 
   //Counter to keep track of # of retransmissions
   int retransmission_count_ = 0;

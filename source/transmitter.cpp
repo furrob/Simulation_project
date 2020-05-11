@@ -12,7 +12,12 @@ Transmitter::Transmitter(int id): id_(id)
 
 Transmitter::~Transmitter()
 {
-
+  while(!buffer_.empty())
+  {
+    Packet* temp = buffer_.front();
+    buffer_.pop();
+    delete temp;
+  }
 }
 
 void Transmitter::AddPacket(Packet* packet)
