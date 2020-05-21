@@ -1,6 +1,6 @@
 #include "simulator.h"
 
-Simulator::Simulator(Logger* logger): logger_(logger)
+Simulator::Simulator(Logger* logger, double lambda): logger_(logger), lambda_(lambda)
 {
   //front small <-> back big
   auto comp = [](Process* l, Process* r)
@@ -21,7 +21,7 @@ Simulator::~Simulator()
   }
 }
 
-int Simulator::Initialize()
+int Simulator::Init() //todo add seeds
 {
   logger_->Debug("SIMULATOR::INITIALIZE\n");
   logger_->IndentForward();
@@ -29,9 +29,9 @@ int Simulator::Initialize()
   //before ANY Acivate() call this must be initialized to 0
   clock_ = 0;
 
-  network_ = new WirelessNetwork(this, logger_);
+  network_ = new WirelessNetwork(this, logger_, 997);
 
-  network_->Initialize();
+  network_->Init(33); //<------------------------------------
 
   logger_->IndentBack();
   logger_->Debug("SIMULATOR::INITIALIZE - DONE\n");

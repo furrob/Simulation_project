@@ -6,6 +6,7 @@
 #include "process.h"
 #include "transmitter.h"
 #include "simulator.h"
+#include "randomgenerator.h"
 
 #include <cstdlib>
 
@@ -19,7 +20,7 @@ class PacketGenerator :
 {
 public:
 
-  PacketGenerator(Simulator* simulator, Transmitter* transmitter);
+  PacketGenerator(Simulator* simulator, Transmitter* transmitter, int seed_CGP);
 
   ~PacketGenerator();
 
@@ -29,8 +30,13 @@ public:
   //process *is* already removed from Agenda
   void Activate(double time) override;
 
+  //Places process on agenda
+  void Init();
+
 private:
   Simulator* simulator_ = nullptr;
+
+  RandomGenerator rand_CGP_;
 
   //Pointer to transmitter, to which buffer generated packets will go
   Transmitter* transmitter_ = nullptr;

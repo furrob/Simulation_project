@@ -9,6 +9,7 @@
 #include "medium.h"
 #include "wirelessnetwork.h"
 #include "simulator.h"
+#include "randomgenerator.h"
 
 #include <cstdio>
 

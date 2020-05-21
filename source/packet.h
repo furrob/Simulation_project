@@ -28,9 +28,6 @@ public:
   //on Packet destruction, signal transmitter that it can process next packet from buffer (if exists)
   ~Packet();
 
-  //Returns random retransmission time for specified packet
-  double GetCRPTime();
-
   void set_collision(bool collision) { collided_ = collision; }
 
   //Randomly marks Packet as corrupted (has_errors_ = true)
@@ -39,8 +36,15 @@ public:
   //Returns true if packet has no error or collision
   bool Verify() { return (!has_errors_ && !collided_); }
 
-  //TEST TEST TEST TEST TEST
-  bool terminated() { return is_terminated_; }
+  int get_retransmission_count() const
+  {
+    return retransmission_count_;
+  }
+
+  double get_transmission_time() const
+  {
+    return transmission_time_;
+  }
 
   void Execute() override;
 

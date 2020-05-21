@@ -1,8 +1,8 @@
 #include "packetgenerator.h"
 
 
-PacketGenerator::PacketGenerator(Simulator* simulator, Transmitter* transmitter) :
-  simulator_(simulator), transmitter_(transmitter)
+PacketGenerator::PacketGenerator(Simulator* simulator, Transmitter* transmitter, int seed_CGP) :
+  simulator_(simulator), transmitter_(transmitter), rand_CGP_(seed_CGP, simulator_->get_lambda())
 {
   time_ = 0;
   id_ = transmitter_->get_id();
@@ -28,7 +28,7 @@ void PacketGenerator::Execute()
   transmitter_->AddPacket(temp);
   temp->Activate(0);
 
-  Activate((static_cast<double>(rand() % 80) + 21) / 10); //TEST - "hard coded" next generation time //generate next packet after random time
+  Activate(rand_CGP_.RandExp());
 
   logger_->IndentBack();
 }
@@ -42,4 +42,9 @@ void PacketGenerator::Activate(double time)
     std::to_string(time_) + "[ms] global time\n");
 
   simulator_->Schedule(this);
+}
+
+void PacketGenerator::Init()
+{
+  Activate(rand_CGP_.RandExp());
 }

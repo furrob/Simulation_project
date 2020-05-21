@@ -8,6 +8,8 @@ Packet::Packet(Simulator* simulator, Transmitter* transmitter):
 
   channel_ = simulator_->get_network()->get_channel();
   logger_ = simulator_->get_logger();
+  
+  //TODO init with id and maybe some parameter (seed from file or something?)
 
   logger_->Debug("PACKET::PACKET ID:" + std::to_string(id_) + " created\n");
 }
@@ -15,13 +17,6 @@ Packet::Packet(Simulator* simulator, Transmitter* transmitter):
 Packet::~Packet()
 {
   logger_->Debug("Deleting Packet " + std::to_string(id_) + "\n"); //log
-}
-
-double Packet::GetCRPTime()
-{
-  int r_limit = 1 << retransmission_count_;
-  int r = rand() % r_limit;
-  return transmission_time_ * r;
 }
 
 void Packet::Execute()
@@ -46,7 +41,7 @@ void Packet::Execute()
           transmitter_->PopFromBuffer();
           transmitter_->set_packet(this);
 
-          transmission_time_ = transmitter_->get_transmission_time(true);
+          transmission_time_ = transmitter_->get_transmission_time();
 
           state_ = State::MEDIUM_ACCESSING; //If packet can be transmit by transmitter, change state
           active = true; //instead of calling Activate(0);
@@ -80,11 +75,11 @@ void Packet::Execute()
         {
           logger_->Debug("Preparing to send\n");
           channel_->Transmit(this);//"Put" packet into channel and handle collisions
-          this->TransmissionError();//Random chance that packet data is somehow corrupted - default for now is 20%
+          has_errors_ = channel_->get_TER();//Random chance that packet data is somehow corrupted - default for now is 20%
           state_ = State::IN_TRANSIT;
 
           last_ = true; //to reserve channel after putting packet into it ( to let collisions occur)
-          Activate(0);  //wait for transmission time
+          Activate(0);  //wait to the end of current time
         }
         else
         {
@@ -150,7 +145,7 @@ void Packet::Execute()
           logger_->Debug("ACK timeout -> retransmission attempt\n");
           ++retransmission_count_;
           state_ = State::MEDIUM_ACCESSING; //Try to retransmit packet
-          Activate(GetCRPTime()); //random time - CRP
+          Activate(transmitter_->get_retransmission_time()); //random time - CRP
         }
 
         break;

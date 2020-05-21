@@ -1,8 +1,7 @@
 #include "medium.h"
 
-Medium::Medium(Logger* logger): logger_(logger)
+Medium::Medium(Logger* logger, int seed_TER): logger_(logger), rand_TER_(seed_TER)
 {
-  //auto comp = [](Packet* l, Packet* r) {return l->get_time() > r->get_time(); };
   packets_ = new packet_queue();
 }
 
@@ -17,10 +16,6 @@ Medium::~Medium()
 void Medium::Transmit(Packet* packet)
 {
   packets_->push_back(packet);
-
-  //available_ = false;
-
-
 }
 
 void Medium::Reserve()
@@ -30,7 +25,7 @@ void Medium::Reserve()
   if(packets_->size() > 1)
   {
     collision_ = true;
-    logger_->Debug("Collision - " + std::to_string(packets_->size()) + " packets corrupted\n"); //<- when reserving
+    logger_->Debug("Collision - packet corrupted\n");
   }
 }
 
@@ -67,4 +62,9 @@ void Medium::Release()
     available_ = true;
     collision_ = false;
   }
+}
+
+bool Medium::get_TER()
+{
+  return rand_TER_.RandBin(0.2); //80% chances that packet will be alright
 }

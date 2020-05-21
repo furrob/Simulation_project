@@ -2,21 +2,21 @@
 #define TRANSMITTER_H
 
 #include "packet.h"
-//#include "packetgenerator.h"
+#include "randomgenerator.h"
 
 #include <queue>
+#include <cmath>
 
 class Packet;
-//class PacketGenerator;
 
 //Class representing a single transmitter (and its components) in network 
 class Transmitter
 {
 public:
+  //Identifier of transmitter, pointer to array of seeds and count of seeds (needs 2
+  Transmitter(int id, int seed_CTP, int seed_R);
 
-  Transmitter(int id);
-
-  ~Transmitter(); //TODO write destructor - clear buffer and things like that / not necessary - simulator destructor takescare of it?
+  ~Transmitter();
 
   int get_id() const
   {
@@ -26,15 +26,11 @@ public:
   //Returns true if there is ongoing packet transmission
   bool is_busy() const { return (packet_ == nullptr) ? false : true; }
 
-  //Returns previously drawn transmission time
-  //generate_next = true draws next random time
-  double get_transmission_time(bool generate_next = false)
-  {
-    const double temp_time = transmission_time_;
-    if(generate_next)
-      transmission_time_ = static_cast<double>(rand() % 10) + 1; //random number <1;10> - (CTP)
-    return temp_time;;
-  }
+  //Returns CTP time - random number {1, 2,...,10}
+  double get_transmission_time();
+
+  //Returns CRP time
+  double get_retransmission_time();
 
   //Sets packet_ pointer to currently served packet
   void set_packet(Packet* packet) { packet_ = packet; }
@@ -52,6 +48,9 @@ public:
 private:
   //Transmitter ID
   const int id_ = 0;
+
+  RandomGenerator rand_CTP_;
+  RandomGenerator rand_R_;
 
   //Buffer for packets to transmit
   std::queue<Packet*> buffer_;

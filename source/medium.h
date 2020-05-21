@@ -3,6 +3,7 @@
 
 #include "logger.h"
 #include "packet.h"
+#include "randomgenerator.h"
 
 #include <functional>
 #include <queue>
@@ -16,7 +17,7 @@ class Medium
 public:
   typedef std::vector<Packet*> packet_queue;
 
-  Medium(Logger* logger);
+  Medium(Logger* logger, int seed_TER);
 
   ~Medium();
 
@@ -35,6 +36,8 @@ public:
   //Marks medium as free to transmit if no packets in transmission
   void Release();
 
+  bool get_TER();
+
 private:
   //Vector of packets currently being transmitted. If more than one packet is present in
   //this vector, collision occurred.
@@ -46,6 +49,9 @@ private:
   //Signals if collision occured, set to true when there is more than one packet in packets_
   //queue, false when last packet leaves queue (queue empty)
   bool collision_ = false;
+
+  //For generating channel related errors
+  RandomGenerator rand_TER_;
 
   //Pointer to logger object
   Logger* logger_ = nullptr;

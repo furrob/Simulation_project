@@ -24,6 +24,7 @@
     <ClCompile Include="..\source\medium.cpp" />
     <ClCompile Include="..\source\packet.cpp" />
     <ClCompile Include="..\source\packetgenerator.cpp" />
+    <ClCompile Include="..\source\randomgenerator.cpp" />
     <ClCompile Include="..\source\receiver.cpp" />
     <ClCompile Include="..\source\simulator.cpp" />
     <ClCompile Include="..\source\transmitter.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="..\source\packet.h" />
     <ClInclude Include="..\source\packetgenerator.h" />
     <ClInclude Include="..\source\process.h" />
+    <ClInclude Include="..\source\randomgenerator.h" />
     <ClInclude Include="..\source\receiver.h" />
     <ClInclude Include="..\source\simulator.h" />
     <ClInclude Include="..\source\transmitter.h" />

@@ -8,7 +8,7 @@ class Receiver
 {
 public:
   //Time needed to sent back ACK (constant and the same for every receiver) [ms]
-  static constexpr double ack_time = 10.0; 
+  static constexpr double ack_time = 1.0; 
 
   //Check packets data integrity flags and sets ACK to true or false accordingly.
   //void CheckPacket(Packet* packet);

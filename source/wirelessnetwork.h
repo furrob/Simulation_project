@@ -18,20 +18,19 @@ class Simulator;
 class WirelessNetwork
 {
 public:
-  static constexpr double ack_time = 10.0;
-
+  static constexpr double ack_time = 1.0;
+  
   //Number of retransmissions before packet rejection
   const static int max_retransmission_count = 10;
 
  //Number of tx-rx pairs in network
   const int terminal_pairs_count = 10;
 
-  WirelessNetwork(Simulator* simulator, Logger* logger);
+  WirelessNetwork(Simulator* simulator, Logger* logger, int seed);
 
   ~WirelessNetwork();
 
-  int Initialize();
-
+  int Init(int channel_seed);
 
   Medium* get_channel() const
   {

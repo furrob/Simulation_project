@@ -19,7 +19,9 @@ class Simulator
 public:
   typedef std::priority_queue<Process*, std::deque<Process*>, std::function<bool(Process*, Process*)>> Agenda;
 
-  Simulator(Logger* logger);
+  static constexpr int seed_spacing = 10000; //10k
+
+  Simulator(Logger* logger, double lambda);
 
   ~Simulator();
 
@@ -34,7 +36,7 @@ public:
   }
 
   //Initializes whole system 
-  int Initialize();
+  int Init();
 
   //Start simulation in continuous mode
   int Run(double max_clock = 500);
@@ -47,14 +49,22 @@ public:
     return clock_;
   }
 
-
   bool is_going() const
   {
     return is_going_;
   }
+
+  double get_lambda() const
+  {
+    return lambda_;
+  }
+
 private:
   //Indicates if simulation is running
   bool is_going_ = false;
+
+  //can be set through input parameter to *.exe file
+  double lambda_; 
 
   //Actual simulation time [ms]
   double clock_ = -1;
