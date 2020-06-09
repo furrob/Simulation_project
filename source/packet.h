@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "wirelessnetwork.h"
 #include "simulator.h"
+#include "stats.h"
 
 #include <cstdlib>
 #include <string>
@@ -30,9 +31,6 @@ public:
 
   void set_collision(bool collision) { collided_ = collision; }
 
-  //Randomly marks Packet as corrupted (has_errors_ = true)
-  void TransmissionError(int percent = 20) { has_errors_ = ((rand() % 100 + 1) <= percent) ? true : false; } //TEST
-
   //Returns true if packet has no error or collision
   bool Verify() { return (!has_errors_ && !collided_); }
 
@@ -41,14 +39,14 @@ public:
     return retransmission_count_;
   }
 
-  double get_transmission_time() const
+  int get_transmission_time() const
   {
     return transmission_time_;
   }
 
   void Execute() override;
 
-  void Activate(double time) override;
+  void Activate(int time) override;
 
 private:
   //Pointer to simulator object, needed for agenda access etc
@@ -60,8 +58,10 @@ private:
   //Transmitter - origin of this packet
   Transmitter* transmitter_ = nullptr;
 
+  int tx_id_ = -1;
+
   //Time needed for packet to travel between tx-rx
-  double transmission_time_ = 0;
+  int transmission_time_ = -1;
 
   //Flag to indicate whenever packet has errors
   bool has_errors_ = false;
@@ -70,7 +70,12 @@ private:
   bool collided_ = false;
 
   //Counter to keep track of # of retransmissions
-  int retransmission_count_ = 0;
+  int retransmission_count_ = -1;
+
+  //"timestamp" used in stats
+  int time_of_generation_ = -1;
+
+  Stats* stats_ = nullptr;
 
   //Pointer to transmission medium used to transmit packet
   Medium* channel_ = nullptr;

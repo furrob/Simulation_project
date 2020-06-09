@@ -7,8 +7,8 @@ Transmitter::Transmitter(int id, int seed_CTP, int seed_R): id_(id), rand_CTP_(s
 }
 
 Transmitter::~Transmitter()
-{/* if something is in buffer AND agenda - exception happens
-  while(!buffer_.empty())
+{
+ /* while(!buffer_.empty())
   {
     Packet* temp = buffer_.front();
     buffer_.pop();
@@ -16,15 +16,15 @@ Transmitter::~Transmitter()
   }*/
 }
 
-double Transmitter::get_transmission_time()
+int Transmitter::get_transmission_time()
 {
-  return ceil(rand_CTP_.Rand(1, 10)); //"integer"
+  return rand_CTP_.Rand(10, 100); //"integer"
 }
 
-double Transmitter::get_retransmission_time()
+int Transmitter::get_retransmission_time()
 {
-  double r_max = static_cast<double>((1 << packet_->get_retransmission_count())) - 1;
-  double r = rand_R_.Rand(0, r_max);
+  int r_max = (1 << packet_->get_retransmission_count()) - 1;
+  int r = rand_R_.Rand(0, r_max);
   return packet_->get_transmission_time() * r;
 }
 

@@ -19,15 +19,17 @@ double RandomGenerator::Rand()
   return NextSeed() / M;
 }
 
-double RandomGenerator::Rand(double min, double max)
+int RandomGenerator::Rand(int min, int max)
 {
-  return Rand() * (max - min) + min;
+  double min_ = min / 10;
+  double max_ = max / 10;
+  return 10 * static_cast<int>(floor(Rand() * (max_ - min_) + min_)); //fast and probably ugly fix to retrieve "integer" values of milliseconds (10, 20 and so on)
 }
 
-double RandomGenerator::RandExp()
+int RandomGenerator::RandExp()
 {
   double k = Rand();
-  return -(1.0 / lambda_) * log(k);
+  return 10*(static_cast<int>(-(1.0 / lambda_) * log(k))/10); //return static_cast<int>(-(1.0 / lambda_) * log(k));
 }
 
 bool RandomGenerator::RandBin(double p)

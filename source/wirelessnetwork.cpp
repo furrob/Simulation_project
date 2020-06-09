@@ -1,19 +1,21 @@
 #include "wirelessnetwork.h"
-//todo add various seeds as parameters, maybe in form of vector?
-WirelessNetwork::WirelessNetwork(Simulator* simulator, Logger* logger, int seed): logger_(logger)
+
+WirelessNetwork::WirelessNetwork(Simulator* simulator, Logger* logger, std::vector<int>* seeds, int max_retransmission): logger_(logger)
 {
-  channel_ = new Medium(logger_, seed); //todo different seed!
+  channel_ = new Medium(logger_, Simulator::NextSeed(seeds));
+
+  max_retransmission_count_ = max_retransmission;
 
   generators_.clear();
-
+#ifdef _DEBUG
   logger_->Debug("WIRELESSNETWORK::WIRELESSNETWORK\n");
   logger_->IndentForward();
-
+#endif
   //Fill vector with generators (simulation object pointer needed)
   for(int i = 0; i < terminal_pairs_count; ++i)
   {
-    auto transmitter = new Transmitter(i, seed + i, seed + 10 * i);
-    generators_.push_back(new PacketGenerator(simulator, transmitter, seed * 5 + i)); //todo different seeds!
+    auto transmitter = new Transmitter(i, Simulator::NextSeed(seeds), Simulator::NextSeed(seeds));
+    generators_.push_back(new PacketGenerator(simulator, transmitter, Simulator::NextSeed(seeds)));
   }
 
   logger_->IndentBack();
@@ -30,9 +32,10 @@ WirelessNetwork::~WirelessNetwork()
 
 int WirelessNetwork::Init(int channel_seed)
 {
+#ifdef _DEBUG
   logger_->Debug("WIRELESSNETWORK::INITIALIZE\n");
   logger_->IndentForward();
-
+#endif
   //Place all generators on agenda
   for(auto it = generators_.begin(); it != generators_.end(); ++it)
   {

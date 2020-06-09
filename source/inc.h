@@ -10,8 +10,10 @@
 #include "wirelessnetwork.h"
 #include "simulator.h"
 #include "randomgenerator.h"
+#include "stats.h"
 
 #include <cstdio>
+#include <iterator>
 
 #endif
 

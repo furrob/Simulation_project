@@ -45,6 +45,9 @@
     <ClCompile Include="..\source\randomgenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\wirelessnetwork.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\randomgenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

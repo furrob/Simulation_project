@@ -10,9 +10,9 @@ public:
   virtual ~Process() = default; //pretty important
 
   virtual void Execute() = 0;
-  virtual void Activate(double time) = 0;
+  virtual void Activate(int time) = 0;
 
-  double get_time() const
+  int get_time() const
   {
     return time_;
   }
@@ -36,7 +36,7 @@ protected:
   int id_ = 0;
   bool is_terminated_ = false;
   bool last_ = false;
-  double time_ = -1;
+  int time_ = -1;
   Simulator* simulator_ = nullptr;
 };
 

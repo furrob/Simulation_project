@@ -26,11 +26,11 @@ public:
   //Returns true if there is ongoing packet transmission
   bool is_busy() const { return (packet_ == nullptr) ? false : true; }
 
-  //Returns CTP time - random number {1, 2,...,10}
-  double get_transmission_time();
+  //Returns CTP time - random number {10, 20,...,100} [0.1ms]
+  int get_transmission_time();
 
   //Returns CRP time
-  double get_retransmission_time();
+  int get_retransmission_time();
 
   //Sets packet_ pointer to currently served packet
   void set_packet(Packet* packet) { packet_ = packet; }
@@ -57,11 +57,5 @@ private:
 
   //Pointer to packet being sent
   Packet* packet_ = nullptr;
-
-  //Time needed for packet to reach destination receiver
-  double transmission_time_ = 0;
-
-  //Pointer to packet generator (independently generated packets will go to transmitter's buffer)
-  //PacketGenerator* generator_ = nullptr;
 };
 #endif

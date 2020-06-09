@@ -15,10 +15,10 @@ public:
   double Rand();
 
   //Draws a number between <min;max>
-  double Rand(double min, double max);
+  int Rand(int min, int max);
 
   //Returns number with exponential distribution (intensity lambda, specified in constructor)
-  double RandExp();
+  int RandExp();
 
   //Returns true or false based on probability p (p - true; 1-p - false)
   bool RandBin(double p);

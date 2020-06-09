@@ -25,7 +25,9 @@ void Medium::Reserve()
   if(packets_->size() > 1)
   {
     collision_ = true;
+#ifdef _DEBUG
     logger_->Debug("Collision - packet corrupted\n");
+#endif
   }
 }
 
@@ -64,7 +66,7 @@ void Medium::Release()
   }
 }
 
-bool Medium::get_TER()
+bool Medium::get_TER() //if true, packet has error
 {
-  return rand_TER_.RandBin(0.2); //80% chances that packet will be alright
+  return rand_TER_.RandBin(WirelessNetwork::P); //80% chances that packet will be alright
 }

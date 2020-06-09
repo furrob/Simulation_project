@@ -27,6 +27,7 @@
     <ClCompile Include="..\source\randomgenerator.cpp" />
     <ClCompile Include="..\source\receiver.cpp" />
     <ClCompile Include="..\source\simulator.cpp" />
+    <ClCompile Include="..\source\stats.cpp" />
     <ClCompile Include="..\source\transmitter.cpp" />
     <ClCompile Include="..\source\wirelessnetwork.cpp" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClInclude Include="..\source\randomgenerator.h" />
     <ClInclude Include="..\source\receiver.h" />
     <ClInclude Include="..\source\simulator.h" />
+    <ClInclude Include="..\source\stats.h" />
     <ClInclude Include="..\source\transmitter.h" />
     <ClInclude Include="..\source\wirelessnetwork.h" />
   </ItemGroup>

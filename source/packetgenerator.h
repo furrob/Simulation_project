@@ -7,6 +7,7 @@
 #include "transmitter.h"
 #include "simulator.h"
 #include "randomgenerator.h"
+//#include "stats.h"
 
 #include <cstdlib>
 
@@ -28,7 +29,7 @@ public:
 
   //Reschedule with updated time - assumption -> if Activate() is called,
   //process *is* already removed from Agenda
-  void Activate(double time) override;
+  void Activate(int time) override;
 
   //Places process on agenda
   void Init();

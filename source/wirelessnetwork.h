@@ -18,15 +18,15 @@ class Simulator;
 class WirelessNetwork
 {
 public:
-  static constexpr double ack_time = 1.0;
-  
-  //Number of retransmissions before packet rejection
-  const static int max_retransmission_count = 10;
+  static constexpr int ack_time = 10;
 
  //Number of tx-rx pairs in network
-  const int terminal_pairs_count = 10;
+  static const int terminal_pairs_count = 10; //10
 
-  WirelessNetwork(Simulator* simulator, Logger* logger, int seed);
+  //probability of transmission error occurring
+  static constexpr double P = 0.2; 
+
+  WirelessNetwork(Simulator* simulator, Logger* logger, std::vector<int>* seeds, int max_retransmission);
 
   ~WirelessNetwork();
 
@@ -42,21 +42,24 @@ public:
     return logger_;
   }
 
+  int get_max_retransmission_count() const
+  {
+    return max_retransmission_count_;
+  }
+
   int get_next_packet_id()
   {
     return ++next_packet_id_;
   }
 
 private:
+  int max_retransmission_count_ = 0;
+
   //id of next packet, starting from 0
   int next_packet_id_ = -1;
 
-  //Vector of transmitters
-  //std::vector<Transmitter*> transmitters_; //not needed
+  //Vector of generators
   std::vector<PacketGenerator*> generators_;
-
-  //Vector of receivers
-  //std::vector<Receiver*> receivers_; //not needed
 
   //Structure representing transmission medium and its state
   Medium* channel_ = nullptr;
