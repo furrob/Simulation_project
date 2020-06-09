@@ -15,8 +15,6 @@ Packet::Packet(Simulator* simulator, Transmitter* transmitter):
 
   tx_id_ = transmitter_->get_id();
 
-  retransmission_count_ = 0;
-
 #ifdef _DEBUG
   logger_->Debug("PACKET::PACKET ID:" + std::to_string(id_) + " created\n");
 #endif
@@ -92,16 +90,32 @@ void Packet::Execute()
 
       case State::SENDING:
       {
+        if(retransmission_count_ <= simulator_->get_network()->get_max_retransmission_count())
+        {
 #ifdef _DEBUG
-        logger_->Debug("Preparing to send\n");
+          logger_->Debug("Preparing to send\n");
 #endif
-        channel_->Transmit(this);//"Put" packet into channel and handle collisions
-        has_errors_ = channel_->get_TER();//Random chance that packet data is somehow corrupted - default for now is 20%
-        state_ = State::IN_TRANSIT;
+          channel_->Transmit(this);//"Put" packet into channel and handle collisions
+          has_errors_ = channel_->get_TER();//Random chance that packet data is somehow corrupted - default for now is 20%
+          state_ = State::IN_TRANSIT;
 
-        last_ = true; //to reserve channel after putting packet into it ( to let collisions occur)
-        Activate(0);  //wait to the end of current time
+          last_ = true; //to reserve channel after putting packet into it ( to let collisions occur)
+          Activate(0);  //wait to the end of current time
+        }
+        else
+        {
+#ifdef _DEBUG
+          logger_->Debug("Too many retransmissions -> scheduling packet deletion\n");
+#endif
+          is_terminated_ = true; //too many retransmissions - deleting from system based on this flag
+          stats_->IncPacketsLost(tx_id_);
 
+#ifdef _DEBUG
+          logger_->Debug("Signal transmitter to serve next packet from buffer\n");
+#endif
+          transmitter_->set_packet(nullptr);
+          transmitter_->SendNext();
+        }
         break;
       }
 
@@ -122,7 +136,7 @@ void Packet::Execute()
 #ifdef _DEBUG
         logger_->Debug("Arriving at receiver\n");
 #endif
-        //Take out packet from channel
+        ; //Take out packet from channel
         if(channel_->EndTransmission(id_) != this) //make sure its right one
         {
           logger_->Error("PACKET::EXECUTE Wrong packet received\n");
@@ -174,26 +188,10 @@ void Packet::Execute()
 #endif
           ++retransmission_count_;
 
-          if(retransmission_count_ > simulator_->get_network()->get_max_retransmission_count()) //delete
-          {
-#ifdef _DEBUG
-            logger_->Debug("Too many retransmissions -> scheduling packet deletion\n");
-#endif
-            is_terminated_ = true; //too many retransmissions - deleting from system based on this flag
-            stats_->IncPacketsLost(tx_id_);
+          stats_->IncRetransmissions(tx_id_);
 
-#ifdef _DEBUG
-            logger_->Debug("Signal transmitter to serve next packet from buffer\n");
-#endif
-            transmitter_->set_packet(nullptr);
-            transmitter_->SendNext();
-          }
-          else
-          {
-            stats_->IncRetransmissions(tx_id_);
-
-            state_ = State::MEDIUM_ACCESSING; //Try to retransmit packet
-          };
+          state_ = State::MEDIUM_ACCESSING; //Try to retransmit packet
+          Activate(transmitter_->get_retransmission_time()); //random time - CRP
         }
 
         break;
