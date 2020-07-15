@@ -86,6 +86,7 @@ int Simulator::Run(double max_clock, double initial_phase_duration)
     clock_ = process->get_time();
     ++iteration;
 
+#ifdef _DEBUG
     if(mode != 'y') //as long as key pressed is different from 'y', keep asking to press different key to continue to next "step"
     {
       logger_->Info("SIMULATION CLOCK: " + std::to_string(static_cast<double>(clock_) / 10) + "[ms], ITERATION #" +
@@ -94,9 +95,9 @@ int Simulator::Run(double max_clock, double initial_phase_duration)
       mode = _getch();
       logger_->Info("\n\n");
     }
-#ifdef _DEBUG
     logger_->IndentForward();
 #endif
+
     process->Execute();
 
     //only for packets, generators are -e t e r n a l-

@@ -6,36 +6,39 @@
 
 int main(int argc, char* argv[])
 {
+ #pragma region SeedGeneration
+    /*
+    std::ofstream out_file("./seeds.txt");
+    std::vector<int> out_seeds;
+
+    RandomGenerator rnd(135580);
+
+    for(int i = 0; i < 15 * NO_SEEDS; ++i) //15 simulations * 31 different seeds * 2000000 seed spacing
+    {
+      for(int j=0; j<200000; ++j)
+      {
+        rnd.NextSeed();
+      }
+      out_seeds.push_back(rnd.NextSeed());
+    }
+
+    std::ostream_iterator<int> output_iterator(out_file, "\n");
+    std::copy(out_seeds.begin(), out_seeds.end(), output_iterator);
+    */
+#pragma endregion
   std::cout << "M4 A3\n\n";
 
-#pragma region SeedGeneration
-  /*
-  std::ofstream out_file("./seeds.txt");
-  std::vector<int> out_seeds;
+#ifdef _DEBUG
+  std::cout << "DEBUG\n\n\n";
+#endif
 
-  RandomGenerator rnd(135580);
-
-  for(int i = 0; i < 15 * NO_SEEDS; ++i) //15 simulations * 31 different seeds * 2000000 seed spacing
-  {
-    for(int j=0; j<200000; ++j)
-    {
-      rnd.NextSeed();
-    }
-    out_seeds.push_back(rnd.NextSeed());
-  }
-
-  std::ostream_iterator<int> output_iterator(out_file, "\n");
-  std::copy(out_seeds.begin(), out_seeds.end(), output_iterator);
-  */
-#pragma endregion
-
-  std::cout << "Seeds set <1 - 15>: ";
-  int seeds_set;
-  std::cin >> seeds_set;
+  std::cout << "Number of simulations <1 - 15>: ";
+  int sim_count;
+  std::cin >> sim_count;
   std::cout << std::endl;
 
   std::cout << "Max retransmissions: ";
-  int max_retransmission_count;
+  int max_retransmission_count = 5;
   std::cin >> max_retransmission_count;
   std::cout << std::endl;
 
@@ -54,46 +57,50 @@ int main(int argc, char* argv[])
   std::cin >> initial_phase;
   std::cout << std::endl;
 
-//PREPARE DATA
-  //all seeds in one file, 15 sets 31 seeds each
-  std::ifstream in_file("./seeds.txt");
-
-  std::vector<int> seeds;
-  std::string file_line;
-
-  for(int i = 0; i < (seeds_set - 1) * NO_SEEDS; ++i) //skip some seeds based on which set is chosen
-    std::getline(in_file, file_line);
-
-  for(int i=0; i<NO_SEEDS; ++i) //assumed there is enough seeds
+  for(int i = 1; i <= sim_count; ++i)
   {
-    std::getline(in_file, file_line);
-    seeds.push_back(std::stoi(file_line));
-  }
+    int seeds_set = i;
 
-  if(seeds.size() < NO_SEEDS)
-  {
-    std::cout << "NOT ENOUGH SEEDS\n";
-    _getch();//some pause !NOT _getch()!
-    return -1;
-  }
+    //PREPARE DATA
+      //all seeds in one file, 15 sets 31 seeds each
+    std::ifstream in_file("./seeds.txt");
 
-//PREPARE AND RUN
-  std::string log_file = "./LOGS/LOG_SEEDS" + std::to_string(seeds_set) + ".txt";
-  Logger logger(log_file);
-  logger.set_flag(Logger::Target::CONSOLE);
+    std::vector<int> seeds;
+    std::string file_line;
 
-  logger.set_flag(Logger::Mode::INFO);
-  logger.set_flag(Logger::Mode::ERROR);
+    for(int i = 0; i < (seeds_set - 1) * NO_SEEDS; ++i) //skip some seeds based on which set is chosen
+      std::getline(in_file, file_line);
+
+    for(int i = 0; i < NO_SEEDS; ++i) //assumed there is enough seeds
+    {
+      std::getline(in_file, file_line);
+      seeds.push_back(std::stoi(file_line));
+    }
+
+    if(seeds.size() < NO_SEEDS)
+    {
+      std::cout << "NOT ENOUGH SEEDS\n";
+      _getch();//some pause !NOT _getch()!
+      return -1;
+    }
+
+    //PREPARE AND RUN
+    std::string log_file = "./LOGS/LOG_LAM" + std::to_string(static_cast<int>(lambda * 1000000)) + ".txt";
+    Logger logger(log_file);
+    logger.set_flag(Logger::Target::CONSOLE);
+
+    logger.set_flag(Logger::Mode::INFO);
+    logger.set_flag(Logger::Mode::ERROR);
 #ifdef _DEBUG
-  //logger.set_flag(Logger::Mode::DEBUG);
+    logger.set_flag(Logger::Mode::DEBUG);
 #endif
 
-  auto stats = Stats(WirelessNetwork::terminal_pairs_count, lambda);
-  
-  Simulator simulator = Simulator(&logger, &stats, lambda);
-  simulator.Init(&seeds, max_retransmission_count); //add lambda and faza pocz¹tkowa as input parameters
+    auto stats = Stats(WirelessNetwork::terminal_pairs_count, lambda);
 
-  simulator.Run(max_clock, initial_phase); //in milliseconds
+    Simulator simulator = Simulator(&logger, &stats, lambda);
+    simulator.Init(&seeds, max_retransmission_count); //add lambda and faza pocz¹tkowa as input parameters
+
+    simulator.Run(max_clock, initial_phase); //in milliseconds
 
 #pragma region InitialPhaseData
   ////dump initial phase data to file
@@ -104,27 +111,26 @@ int main(int argc, char* argv[])
   //std::copy(stats.avg_retransmissions_.begin(), stats.avg_retransmissions_.end(), os_it);
 #pragma endregion
 
-  logger.set_flag(Logger::Target::FILE);
-  //view collected data and simulation parameters
-  logger.Info("==========STATS==========\n\n");
+    logger.set_flag(Logger::Target::FILE);
+    //view collected data and simulation parameters
+    logger.Info("==========STATS==========\n\n");
 
-  logger.Info("Seeds set:\t\t\t " + std::to_string(seeds_set) + "\n" + 
-                    "Maximum packet retransmissions:\t " + std::to_string(max_retransmission_count) + "\n" + 
-                    "Lambda value:\t\t\t " + std::to_string(lambda) + "\n" +
-                    "Simulation length:\t\t " + std::to_string(static_cast<int>(max_clock - initial_phase)) + " [ms]\n\n");
+    logger.Info("Seeds set:\t\t\t " + std::to_string(seeds_set) + "\n" +
+      "Maximum packet retransmissions:\t " + std::to_string(max_retransmission_count) + "\n" +
+      "Lambda value:\t\t\t " + std::to_string(lambda) + "\n" +
+      "Simulation length:\t\t " + std::to_string(static_cast<int>(max_clock - initial_phase)) + " [ms]\n\n");
 
-  logger.Info("Packets generated (buff. incl.): " + std::to_string(stats.PacketsGenerated()) + "\n" +
-                    "Packets successfully received:\t " + std::to_string(stats.PacketsReceived()) + "\n" +
-                    "Packets lost:\t\t\t " + std::to_string(stats.PacketsLost()) + "\n\n");
-  //logger.Info("Packets left in buffer:\t\t " + std::to_string(stats.PacketsGenerated() - stats.PacketsServed()) + "\n\n");
+    logger.Info("Packets generated (buff. incl.): " + std::to_string(stats.PacketsGenerated()) + "\n" +
+      "Packets successfully received:\t " + std::to_string(stats.PacketsReceived()) + "\n" +
+      "Packets lost:\t\t\t " + std::to_string(stats.PacketsLost()) + "\n\n");
 
-  logger.Info("AVG Packet Error Rate:\t\t " + std::to_string(stats.AvgPacketErrorRate()) + "\n" +
-                    "Max Packet Error Rate:\t\t " + std::to_string(stats.MaxPacketErrorRate()) + "\n" +
-                    "AVG Retransmission per Packet:\t " + std::to_string(stats.AvgRetransmissionsCount()) + "\n" +
-                    "Network Packet throughput:\t " + std::to_string(stats.PacketThroughput()) + " packets/s\n" +
-                    "AVG Packet Delay:\t\t " + std::to_string(stats.AvgPacketDelay()) + " [ms]\n" +
-                    "AVG Packet Buff Wait Time:\t " + std::to_string(stats.AvgPacketWaitingTime()) + " [ms]\n\n\n");
-
+    logger.Info("AVG Packet Error Rate:\t\t " + std::to_string(stats.AvgPacketErrorRate()) + "\n" +
+      "Max Packet Error Rate:\t\t " + std::to_string(stats.MaxPacketErrorRate()) + "\n" +
+      "AVG Retransmission per Packet:\t " + std::to_string(stats.AvgRetransmissionsCount()) + "\n" +
+      "Network Packet throughput:\t " + std::to_string(stats.PacketThroughput()) + " packets/s\n" +
+      "AVG Packet Delay:\t\t " + std::to_string(stats.AvgPacketDelay()) + " [ms]\n" +
+      "AVG Packet Buff Wait Time:\t " + std::to_string(stats.AvgPacketWaitingTime()) + " [ms]\n\n\n");
+  }
   _getch();
 
 #pragma region Histograms

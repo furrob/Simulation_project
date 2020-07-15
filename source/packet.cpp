@@ -15,6 +15,8 @@ Packet::Packet(Simulator* simulator, Transmitter* transmitter):
 
   tx_id_ = transmitter_->get_id();
 
+  retransmission_count_ = 0;
+
 #ifdef _DEBUG
   logger_->Debug("PACKET::PACKET ID:" + std::to_string(id_) + " created\n");
 #endif
@@ -188,7 +190,8 @@ void Packet::Execute()
 #endif
           ++retransmission_count_;
 
-          stats_->IncRetransmissions(tx_id_);
+          if(retransmission_count_ <= simulator_->get_network()->get_max_retransmission_count())
+            stats_->IncRetransmissions(tx_id_); //test
 
           state_ = State::MEDIUM_ACCESSING; //Try to retransmit packet
           Activate(transmitter_->get_retransmission_time()); //random time - CRP
